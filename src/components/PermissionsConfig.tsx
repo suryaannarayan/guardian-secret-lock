@@ -12,7 +12,7 @@ import {
   MapPin, 
   Phone, 
   MessageSquare,
-  Contacts,
+  Contact,
   Calendar,
   Settings,
   Wifi,
@@ -62,7 +62,7 @@ const PermissionsConfig: React.FC<PermissionsConfigProps> = ({ permissions, onPe
       permissions: [
         { key: 'phone', icon: Phone, title: 'Phone Access', desc: 'Make and manage calls' },
         { key: 'sms', icon: MessageSquare, title: 'SMS Access', desc: 'Read and send messages' },
-        { key: 'contacts', icon: Contacts, title: 'Contacts Access', desc: 'Read and modify contacts' },
+        { key: 'contacts', icon: Contact, title: 'Contacts Access', desc: 'Read and modify contacts' },
         { key: 'callLog', icon: Phone, title: 'Call Log', desc: 'Access call history' }
       ]
     },
