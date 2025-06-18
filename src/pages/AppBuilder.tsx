@@ -35,6 +35,7 @@ const AppBuilder = () => {
   });
 
   const [buildStatus, setBuildStatus] = useState("");
+  const [apkDownloadUrl, setApkDownloadUrl] = useState("");
 
   const toggleFeature = (feature: string) => {
     setAppConfig(prev => ({
@@ -48,16 +49,28 @@ const AppBuilder = () => {
 
   const buildApp = () => {
     setBuildStatus("Building app...");
+    setApkDownloadUrl("");
+    
+    // Simulate build process
     setTimeout(() => {
-      setBuildStatus("App built successfully! Ready for deployment.");
+      setBuildStatus("App built successfully! APK ready for download.");
+      // Simulate APK file generation
+      setApkDownloadUrl(`/downloads/${appConfig.name.replace(/\s+/g, '_')}_v${appConfig.version}.apk`);
     }, 3000);
   };
 
-  const deployApp = () => {
-    setBuildStatus("Deploying to device...");
-    setTimeout(() => {
-      setBuildStatus("App deployed successfully!");
-    }, 2000);
+  const downloadApk = () => {
+    if (apkDownloadUrl) {
+      // Simulate APK download
+      const link = document.createElement('a');
+      link.href = apkDownloadUrl;
+      link.download = `${appConfig.name.replace(/\s+/g, '_')}_v${appConfig.version}.apk`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      setBuildStatus("APK download started!");
+    }
   };
 
   return (
@@ -68,7 +81,7 @@ const AppBuilder = () => {
             ParentShield App Builder
           </h1>
           <p className="text-slate-300 text-lg">
-            Create and deploy custom parental control applications
+            Create and build custom parental control applications
           </p>
         </div>
 
@@ -77,7 +90,7 @@ const AppBuilder = () => {
             <TabsTrigger value="config" className="text-white">Configuration</TabsTrigger>
             <TabsTrigger value="features" className="text-white">Features</TabsTrigger>
             <TabsTrigger value="customize" className="text-white">Customize</TabsTrigger>
-            <TabsTrigger value="build" className="text-white">Build & Deploy</TabsTrigger>
+            <TabsTrigger value="build" className="text-white">Build & Download</TabsTrigger>
           </TabsList>
 
           <TabsContent value="config">
@@ -239,7 +252,7 @@ const AppBuilder = () => {
                     Build Configuration
                   </CardTitle>
                   <CardDescription className="text-slate-300">
-                    Generate and deploy your parental control app
+                    Generate your parental control app as APK file
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
@@ -247,16 +260,15 @@ const AppBuilder = () => {
                     <div className="p-4 bg-slate-700/30 rounded-lg">
                       <h4 className="text-white font-medium mb-2">Platform</h4>
                       <select className="w-full p-2 bg-slate-700 border border-slate-600 rounded text-white">
-                        <option>Android</option>
-                        <option>iOS</option>
-                        <option>Both</option>
+                        <option>Android APK</option>
+                        <option>Android AAB</option>
                       </select>
                     </div>
                     <div className="p-4 bg-slate-700/30 rounded-lg">
                       <h4 className="text-white font-medium mb-2">Build Type</h4>
                       <select className="w-full p-2 bg-slate-700 border border-slate-600 rounded text-white">
-                        <option>Debug</option>
                         <option>Release</option>
+                        <option>Debug</option>
                       </select>
                     </div>
                     <div className="p-4 bg-slate-700/30 rounded-lg">
@@ -271,17 +283,35 @@ const AppBuilder = () => {
                   <div className="flex gap-4">
                     <Button onClick={buildApp} className="flex-1 bg-purple-600 hover:bg-purple-700">
                       <Play className="h-4 w-4 mr-2" />
-                      Build App
+                      Build APK
                     </Button>
-                    <Button onClick={deployApp} variant="outline" className="flex-1">
-                      <Download className="h-4 w-4 mr-2" />
-                      Deploy to Device
-                    </Button>
+                    {apkDownloadUrl && (
+                      <Button onClick={downloadApk} className="flex-1 bg-green-600 hover:bg-green-700">
+                        <Download className="h-4 w-4 mr-2" />
+                        Download APK
+                      </Button>
+                    )}
                   </div>
 
                   {buildStatus && (
-                    <div className="p-4 bg-green-600/20 border border-green-500 rounded-lg">
-                      <p className="text-green-400">{buildStatus}</p>
+                    <div className={`p-4 border rounded-lg ${
+                      buildStatus.includes("successfully") 
+                        ? "bg-green-600/20 border-green-500 text-green-400"
+                        : "bg-blue-600/20 border-blue-500 text-blue-400"
+                    }`}>
+                      <p>{buildStatus}</p>
+                    </div>
+                  )}
+
+                  {apkDownloadUrl && (
+                    <div className="p-4 bg-slate-700/30 rounded-lg">
+                      <h4 className="text-white font-medium mb-2">APK Details</h4>
+                      <div className="space-y-2 text-slate-300">
+                        <p><span className="font-medium">File:</span> {appConfig.name.replace(/\s+/g, '_')}_v{appConfig.version}.apk</p>
+                        <p><span className="font-medium">Size:</span> ~12.5 MB</p>
+                        <p><span className="font-medium">Min Android:</span> 7.0 (API 24)</p>
+                        <p><span className="font-medium">Target Android:</span> 14.0 (API 34)</p>
+                      </div>
                     </div>
                   )}
                 </CardContent>
@@ -294,20 +324,24 @@ const AppBuilder = () => {
                 <CardContent>
                   <div className="space-y-4 text-slate-300">
                     <div>
-                      <h4 className="text-white font-medium mb-2">1. Enable Developer Options</h4>
-                      <p>Go to Settings → About Phone → Tap Build Number 7 times</p>
+                      <h4 className="text-white font-medium mb-2">1. Enable Unknown Sources</h4>
+                      <p>Go to Settings → Security → Enable "Install from Unknown Sources" or "Allow from this source"</p>
                     </div>
                     <div>
-                      <h4 className="text-white font-medium mb-2">2. Enable USB Debugging</h4>
-                      <p>Go to Settings → Developer Options → Enable USB Debugging</p>
+                      <h4 className="text-white font-medium mb-2">2. Transfer APK File</h4>
+                      <p>Download the APK file to your Android device via USB, email, or cloud storage</p>
                     </div>
                     <div>
                       <h4 className="text-white font-medium mb-2">3. Install APK</h4>
-                      <p>Connect device via USB and click "Deploy to Device" or manually install the APK</p>
+                      <p>Open the APK file on your device and follow the installation prompts</p>
                     </div>
                     <div>
                       <h4 className="text-white font-medium mb-2">4. Grant Permissions</h4>
-                      <p>Enable Device Administrator and grant all requested permissions</p>
+                      <p>Enable Device Administrator and grant all requested permissions for full functionality</p>
+                    </div>
+                    <div>
+                      <h4 className="text-white font-medium mb-2">5. Access App</h4>
+                      <p>Use the secret dialer code (*#{appConfig.secretCode}#) to access the hidden app</p>
                     </div>
                   </div>
                 </CardContent>
