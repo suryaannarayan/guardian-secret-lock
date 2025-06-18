@@ -168,7 +168,7 @@ const ScreenTimeManager: React.FC<ScreenTimeManagerProps> = ({ device }) => {
                     <div className="text-2xl">{app.icon}</div>
                     <div className="flex-1">
                       <div className="flex justify-between items-center mb-1">
-                        <span className="text-white font-medium">{app.name}</span>
+                        <span className="text-white font-medium">{app.app}</span>
                         <span className="text-slate-300">{app.time}m</span>
                       </div>
                       <div className="w-full bg-slate-700 rounded-full h-2">
@@ -277,7 +277,7 @@ const ScreenTimeManager: React.FC<ScreenTimeManagerProps> = ({ device }) => {
                   <div key={index} className="flex items-center justify-between p-3 bg-slate-700/30 rounded-lg">
                     <div className="flex items-center gap-3">
                       <span className="text-xl">{app.icon}</span>
-                      <span className="text-white">{app.name}</span>
+                      <span className="text-white">{app.app}</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <Input 
