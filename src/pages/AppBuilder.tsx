@@ -1,9 +1,9 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import PermissionsConfig from "@/components/PermissionsConfig";
 import { 
   Smartphone, 
   Shield, 
@@ -15,7 +15,8 @@ import {
   Download,
   Play,
   Code,
-  Palette
+  Palette,
+  Lock
 } from "lucide-react";
 
 const AppBuilder = () => {
@@ -29,6 +30,28 @@ const AppBuilder = () => {
       locationTracking: true,
       contentFilter: true,
       activityReports: true
+    },
+    permissions: {
+      deviceAdmin: true,
+      systemAlert: true,
+      accessibility: true,
+      deviceOwner: false,
+      storage: true,
+      manageStorage: true,
+      batteryOptimization: true,
+      powerManager: true,
+      camera: true,
+      microphone: true,
+      location: true,
+      fineLocation: true,
+      phone: true,
+      sms: true,
+      contacts: true,
+      callLog: true,
+      wifi: true,
+      bluetooth: true,
+      networkState: true,
+      changeNetworkState: true
     },
     theme: "dark",
     secretCode: "123456"
@@ -47,13 +70,23 @@ const AppBuilder = () => {
     }));
   };
 
+  const handlePermissionChange = (permission: string, value: boolean) => {
+    setAppConfig(prev => ({
+      ...prev,
+      permissions: {
+        ...prev.permissions,
+        [permission]: value
+      }
+    }));
+  };
+
   const buildApp = () => {
-    setBuildStatus("Building app...");
+    setBuildStatus("Building app with full permissions...");
     setApkDownloadUrl("");
     
     // Simulate build process
     setTimeout(() => {
-      setBuildStatus("App built successfully! APK ready for download.");
+      setBuildStatus("App built successfully! APK ready for download with all requested permissions.");
       // Simulate APK file generation
       setApkDownloadUrl(`/downloads/${appConfig.name.replace(/\s+/g, '_')}_v${appConfig.version}.apk`);
     }, 3000);
@@ -81,14 +114,15 @@ const AppBuilder = () => {
             ParentShield App Builder
           </h1>
           <p className="text-slate-300 text-lg">
-            Create and build custom parental control applications
+            Create and build custom parental control applications with full device permissions
           </p>
         </div>
 
         <Tabs defaultValue="config" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4 bg-slate-800/50">
+          <TabsList className="grid w-full grid-cols-5 bg-slate-800/50">
             <TabsTrigger value="config" className="text-white">Configuration</TabsTrigger>
             <TabsTrigger value="features" className="text-white">Features</TabsTrigger>
+            <TabsTrigger value="permissions" className="text-white">Permissions</TabsTrigger>
             <TabsTrigger value="customize" className="text-white">Customize</TabsTrigger>
             <TabsTrigger value="build" className="text-white">Build & Download</TabsTrigger>
           </TabsList>
@@ -196,6 +230,26 @@ const AppBuilder = () => {
             </Card>
           </TabsContent>
 
+          <TabsContent value="permissions">
+            <Card className="bg-slate-800/50 border-slate-700">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center gap-2">
+                  <Lock className="h-5 w-5" />
+                  Android Permissions
+                </CardTitle>
+                <CardDescription className="text-slate-300">
+                  Configure device permissions for full parental control functionality
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <PermissionsConfig 
+                  permissions={appConfig.permissions}
+                  onPermissionChange={handlePermissionChange}
+                />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
           <TabsContent value="customize">
             <Card className="bg-slate-800/50 border-slate-700">
               <CardHeader>
@@ -252,7 +306,7 @@ const AppBuilder = () => {
                     Build Configuration
                   </CardTitle>
                   <CardDescription className="text-slate-300">
-                    Generate your parental control app as APK file
+                    Generate your parental control app as APK file with full permissions
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
@@ -283,7 +337,7 @@ const AppBuilder = () => {
                   <div className="flex gap-4">
                     <Button onClick={buildApp} className="flex-1 bg-purple-600 hover:bg-purple-700">
                       <Play className="h-4 w-4 mr-2" />
-                      Build APK
+                      Build APK with Full Permissions
                     </Button>
                     {apkDownloadUrl && (
                       <Button onClick={downloadApk} className="flex-1 bg-green-600 hover:bg-green-700">
@@ -308,9 +362,10 @@ const AppBuilder = () => {
                       <h4 className="text-white font-medium mb-2">APK Details</h4>
                       <div className="space-y-2 text-slate-300">
                         <p><span className="font-medium">File:</span> {appConfig.name.replace(/\s+/g, '_')}_v{appConfig.version}.apk</p>
-                        <p><span className="font-medium">Size:</span> ~12.5 MB</p>
+                        <p><span className="font-medium">Size:</span> ~15.2 MB (with full permissions)</p>
                         <p><span className="font-medium">Min Android:</span> 7.0 (API 24)</p>
                         <p><span className="font-medium">Target Android:</span> 14.0 (API 34)</p>
+                        <p><span className="font-medium">Permissions:</span> {Object.values(appConfig.permissions).filter(Boolean).length} enabled</p>
                       </div>
                     </div>
                   )}
@@ -336,11 +391,15 @@ const AppBuilder = () => {
                       <p>Open the APK file on your device and follow the installation prompts</p>
                     </div>
                     <div>
-                      <h4 className="text-white font-medium mb-2">4. Grant Permissions</h4>
-                      <p>Enable Device Administrator and grant all requested permissions for full functionality</p>
+                      <h4 className="text-white font-medium mb-2">4. Grant All Permissions</h4>
+                      <p>Enable Device Administrator, grant all requested permissions, and disable battery optimization for full functionality</p>
                     </div>
                     <div>
-                      <h4 className="text-white font-medium mb-2">5. Access App</h4>
+                      <h4 className="text-white font-medium mb-2">5. Enable Accessibility Service</h4>
+                      <p>Go to Settings → Accessibility and enable the app's accessibility service for advanced monitoring</p>
+                    </div>
+                    <div>
+                      <h4 className="text-white font-medium mb-2">6. Access App</h4>
                       <p>Use the secret dialer code (*#{appConfig.secretCode}#) to access the hidden app</p>
                     </div>
                   </div>
