@@ -4,19 +4,22 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Progress } from "@/components/ui/progress";
 import { 
   Shield, 
-  Globe, 
+  Globe,
+  Search,
+  Ban,
   AlertTriangle,
-  CheckCircle,
-  XCircle,
+  Eye,
+  Lock,
+  Filter,
   Plus,
   Trash2,
-  Search,
-  Filter
+  CheckCircle,
+  XCircle
 } from 'lucide-react';
 
 interface ContentFilterProps {
@@ -24,48 +27,42 @@ interface ContentFilterProps {
 }
 
 const ContentFilter: React.FC<ContentFilterProps> = ({ device }) => {
-  const [filterEnabled, setFilterEnabled] = useState(true);
+  const [safeSearchEnabled, setSafeSearchEnabled] = useState(true);
+  const [adBlockEnabled, setAdBlockEnabled] = useState(true);
   const [newBlockedSite, setNewBlockedSite] = useState('');
-  const [filterLevel, setFilterLevel] = useState(2);
 
-  const filterLevels = [
-    { id: 0, name: "Off", description: "No filtering" },
-    { id: 1, name: "Light", description: "Block adult content only" },
-    { id: 2, name: "Moderate", description: "Block adult, violence, and mature content" },
-    { id: 3, name: "Strict", description: "Allow only educational and pre-approved sites" },
-  ];
-
-  const blockedCategories = [
-    { name: "Adult Content", blocked: 456, color: "bg-red-500", enabled: true },
-    { name: "Violence", blocked: 123, color: "bg-orange-500", enabled: true },
-    { name: "Gambling", blocked: 89, color: "bg-yellow-500", enabled: true },
-    { name: "Social Media", blocked: 234, color: "bg-blue-500", enabled: false },
-    { name: "Gaming", blocked: 167, color: "bg-purple-500", enabled: false },
-    { name: "Shopping", blocked: 45, color: "bg-green-500", enabled: false },
+  const filterCategories = [
+    { name: 'Adult Content', enabled: true, level: 'strict' },
+    { name: 'Violence', enabled: true, level: 'moderate' },
+    { name: 'Gambling', enabled: true, level: 'strict' },
+    { name: 'Drugs & Alcohol', enabled: true, level: 'strict' },
+    { name: 'Social Media', enabled: false, level: 'off' },
+    { name: 'Gaming', enabled: false, level: 'off' },
+    { name: 'Shopping', enabled: false, level: 'off' },
+    { name: 'News', enabled: false, level: 'off' }
   ];
 
   const blockedSites = [
-    { id: 1, url: "facebook.com", category: "Social Media", attempts: 15 },
-    { id: 2, url: "tiktok.com", category: "Social Media", attempts: 23 },
-    { id: 3, url: "inappropriate-site.com", category: "Adult Content", attempts: 3 },
-    { id: 4, url: "violent-games.com", category: "Violence", attempts: 8 },
+    { url: 'facebook.com', category: 'Social Media', blocked: true },
+    { url: 'instagram.com', category: 'Social Media', blocked: true },
+    { url: 'tiktok.com', category: 'Social Media', blocked: true },
+    { url: 'pornhub.com', category: 'Adult Content', blocked: true },
+    { url: 'bet365.com', category: 'Gambling', blocked: true }
   ];
 
   const allowedSites = [
-    { id: 1, url: "khanacademy.org", category: "Education" },
-    { id: 2, url: "nationalgeographic.com", category: "Education" },
-    { id: 3, url: "wikipedia.org", category: "Reference" },
-    { id: 4, url: "codecademy.com", category: "Education" },
+    { url: 'khanacademy.org', category: 'Education', whitelisted: true },
+    { url: 'wikipedia.org', category: 'Education', whitelisted: true },
+    { url: 'google.com', category: 'Search', whitelisted: true },
+    { url: 'youtube.com/education', category: 'Education', whitelisted: true }
   ];
 
   const recentActivity = [
-    { time: "14:30", action: "Blocked", site: "facebook.com", category: "Social Media" },
-    { time: "14:25", action: "Allowed", site: "khanacademy.org", category: "Education" },
-    { time: "14:20", action: "Blocked", site: "tiktok.com", category: "Social Media" },
-    { time: "14:15", action: "Allowed", site: "wikipedia.org", category: "Reference" },
+    { time: '14:32', site: 'youtube.com', action: 'allowed', category: 'Entertainment' },
+    { time: '14:25', site: 'facebook.com', action: 'blocked', category: 'Social Media' },
+    { time: '14:20', site: 'khanacademy.org', action: 'allowed', category: 'Education' },
+    { time: '14:15', site: 'inappropriate-site.com', action: 'blocked', category: 'Adult Content' }
   ];
-
-  const totalBlocked = blockedCategories.reduce((sum, cat) => sum + cat.blocked, 0);
 
   return (
     <div className="space-y-6">
@@ -75,28 +72,26 @@ const ContentFilter: React.FC<ContentFilterProps> = ({ device }) => {
           <CardHeader>
             <CardTitle className="text-white flex items-center gap-2">
               <Shield className="h-5 w-5 text-blue-400" />
-              Filter Status
+              Protection Status
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <span className="text-slate-300">Content Filter</span>
-                <Switch 
-                  checked={filterEnabled} 
-                  onCheckedChange={setFilterEnabled}
-                />
+            <div className="space-y-3">
+              <div className="flex justify-between items-center">
+                <span className="text-slate-300">Web Filter</span>
+                <Badge className="bg-green-600">Active</Badge>
               </div>
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <span className="text-slate-300">Filter Level</span>
-                  <Badge className="bg-blue-600">
-                    {filterLevels[filterLevel].name}
-                  </Badge>
-                </div>
-                <p className="text-sm text-slate-400">
-                  {filterLevels[filterLevel].description}
-                </p>
+              <div className="flex justify-between items-center">
+                <span className="text-slate-300">Safe Search</span>
+                <Badge className="bg-green-600">Enabled</Badge>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-slate-300">Ad Blocker</span>
+                <Badge className="bg-green-600">Active</Badge>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-slate-300">Sites Blocked</span>
+                <span className="text-white font-medium">{blockedSites.length}</span>
               </div>
             </div>
           </CardContent>
@@ -104,23 +99,14 @@ const ContentFilter: React.FC<ContentFilterProps> = ({ device }) => {
 
         <Card className="bg-slate-800/50 border-slate-700">
           <CardHeader>
-            <CardTitle className="text-white">Today's Activity</CardTitle>
+            <CardTitle className="text-white">Today's Blocks</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-3">
-              <div className="text-center">
-                <div className="text-3xl font-bold text-red-400">{totalBlocked}</div>
-                <div className="text-sm text-slate-400">Sites Blocked</div>
-              </div>
-              <div className="grid grid-cols-2 gap-4 text-center">
-                <div>
-                  <div className="text-xl font-bold text-green-400">87</div>
-                  <div className="text-xs text-slate-400">Allowed</div>
-                </div>
-                <div>
-                  <div className="text-xl font-bold text-yellow-400">12</div>
-                  <div className="text-xs text-slate-400">Warnings</div>
-                </div>
+            <div className="text-center space-y-2">
+              <div className="text-3xl font-bold text-red-400">24</div>
+              <p className="text-sm text-slate-400">Inappropriate sites blocked</p>
+              <div className="text-sm text-slate-300">
+                ↑ 15% from yesterday
               </div>
             </div>
           </CardContent>
@@ -131,34 +117,28 @@ const ContentFilter: React.FC<ContentFilterProps> = ({ device }) => {
             <CardTitle className="text-white">Quick Actions</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            <Button className="w-full bg-red-600 hover:bg-red-700">
-              <Shield className="mr-2 h-4 w-4" />
-              Block All Social Media
+            <Button className="w-full bg-blue-600 hover:bg-blue-700">
+              <Eye className="mr-2 h-4 w-4" />
+              View Activity Log
             </Button>
             <Button 
               variant="outline" 
               className="w-full border-slate-600 text-slate-300 hover:bg-slate-700"
             >
-              <CheckCircle className="mr-2 h-4 w-4" />
-              Study Mode
-            </Button>
-            <Button 
-              variant="outline" 
-              className="w-full border-blue-600 text-blue-400 hover:bg-blue-900/20"
-            >
-              <Globe className="mr-2 h-4 w-4" />
-              Safe Browsing Only
+              <Lock className="mr-2 h-4 w-4" />
+              Lock All Browsing
             </Button>
           </CardContent>
         </Card>
       </div>
 
-      {/* Detailed Controls */}
+      {/* Main Content Filtering */}
       <Tabs defaultValue="categories" className="space-y-4">
         <TabsList className="bg-slate-800/50 border-slate-700">
           <TabsTrigger value="categories" className="data-[state=active]:bg-blue-600">Categories</TabsTrigger>
-          <TabsTrigger value="websites" className="data-[state=active]:bg-blue-600">Websites</TabsTrigger>
-          <TabsTrigger value="activity" className="data-[state=active]:bg-blue-600">Activity Log</TabsTrigger>
+          <TabsTrigger value="sites" className="data-[state=active]:bg-blue-600">Blocked Sites</TabsTrigger>
+          <TabsTrigger value="allowed" className="data-[state=active]:bg-blue-600">Allowed Sites</TabsTrigger>
+          <TabsTrigger value="activity" className="data-[state=active]:bg-blue-600">Activity</TabsTrigger>
           <TabsTrigger value="settings" className="data-[state=active]:bg-blue-600">Settings</TabsTrigger>
         </TabsList>
 
@@ -167,26 +147,34 @@ const ContentFilter: React.FC<ContentFilterProps> = ({ device }) => {
             <CardHeader>
               <CardTitle className="text-white">Content Categories</CardTitle>
               <CardDescription className="text-slate-400">
-                Control access to different types of content
+                Choose which types of content to filter
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                {blockedCategories.map((category, index) => (
-                  <div key={index} className="flex items-center justify-between p-4 bg-slate-700/30 rounded-lg">
-                    <div className="flex items-center gap-4">
-                      <div className={`w-4 h-4 rounded-full ${category.color}`} />
+              <div className="grid gap-4">
+                {filterCategories.map((category, index) => (
+                  <div key={index} className="flex items-center justify-between p-3 bg-slate-700/30 rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <Filter className="h-5 w-5 text-blue-400" />
                       <div>
-                        <h3 className="font-semibold text-white">{category.name}</h3>
-                        <p className="text-sm text-slate-400">{category.blocked} sites blocked today</p>
+                        <h4 className="text-white font-medium">{category.name}</h4>
+                        <p className="text-sm text-slate-400">
+                          Level: {category.level}
+                        </p>
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
-                      <Badge className={category.enabled ? 'bg-red-600' : 'bg-green-600'}>
-                        {category.enabled ? 'Blocked' : 'Allowed'}
-                      </Badge>
+                      <select 
+                        className="bg-slate-700/50 border border-slate-600 rounded px-2 py-1 text-white text-sm"
+                        defaultValue={category.level}
+                      >
+                        <option value="off">Off</option>
+                        <option value="lenient">Lenient</option>
+                        <option value="moderate">Moderate</option>
+                        <option value="strict">Strict</option>
+                      </select>
                       <Switch 
-                        checked={!category.enabled} 
+                        checked={category.enabled} 
                         onCheckedChange={() => {}}
                       />
                     </div>
@@ -197,66 +185,46 @@ const ContentFilter: React.FC<ContentFilterProps> = ({ device }) => {
           </Card>
         </TabsContent>
 
-        <TabsContent value="websites">
-          <div className="space-y-6">
-            {/* Add New Site */}
-            <Card className="bg-slate-800/50 border-slate-700">
-              <CardHeader>
-                <CardTitle className="text-white">Add Website</CardTitle>
-              </CardHeader>
-              <CardContent>
+        <TabsContent value="sites">
+          <Card className="bg-slate-800/50 border-slate-700">
+            <CardHeader>
+              <CardTitle className="text-white">Blocked Websites</CardTitle>
+              <CardDescription className="text-slate-400">
+                Manually block specific websites
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
                 <div className="flex gap-4">
                   <Input 
-                    placeholder="Enter website URL (e.g., example.com)"
+                    placeholder="Enter website URL (e.g., facebook.com)"
                     value={newBlockedSite}
                     onChange={(e) => setNewBlockedSite(e.target.value)}
                     className="bg-slate-700/50 border-slate-600 text-white"
                   />
                   <Button className="bg-red-600 hover:bg-red-700">
-                    <Plus className="mr-2 h-4 w-4" />
+                    <Ban className="mr-2 h-4 w-4" />
                     Block Site
                   </Button>
-                  <Button 
-                    variant="outline" 
-                    className="border-green-600 text-green-400 hover:bg-green-900/20"
-                  >
-                    <Plus className="mr-2 h-4 w-4" />
-                    Allow Site
-                  </Button>
                 </div>
-              </CardContent>
-            </Card>
 
-            {/* Blocked Sites */}
-            <Card className="bg-slate-800/50 border-slate-700">
-              <CardHeader>
-                <CardTitle className="text-white flex items-center gap-2">
-                  <XCircle className="h-5 w-5 text-red-400" />
-                  Blocked Websites
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
                 <div className="space-y-3">
-                  {blockedSites.map((site) => (
-                    <div key={site.id} className="flex items-center justify-between p-3 bg-slate-700/30 rounded-lg border-l-4 border-l-red-500">
-                      <div>
-                        <h3 className="font-semibold text-white">{site.url}</h3>
-                        <div className="flex items-center gap-2 mt-1">
-                          <Badge variant="outline" className="border-slate-600 text-slate-300">
-                            {site.category}
-                          </Badge>
-                          <span className="text-sm text-slate-400">
-                            {site.attempts} blocked attempts today
-                          </span>
+                  {blockedSites.map((site, index) => (
+                    <div key={index} className="flex items-center justify-between p-3 bg-slate-700/30 rounded-lg border-l-4 border-l-red-500">
+                      <div className="flex items-center gap-3">
+                        <Globe className="h-5 w-5 text-red-400" />
+                        <div>
+                          <h4 className="text-white font-medium">{site.url}</h4>
+                          <p className="text-sm text-slate-400">{site.category}</p>
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
+                        <Badge className="bg-red-600">Blocked</Badge>
                         <Button 
                           variant="outline" 
                           size="sm"
                           className="border-green-600 text-green-400 hover:bg-green-900/20"
                         >
-                          <CheckCircle className="w-4 h-4 mr-1" />
                           Allow
                         </Button>
                         <Button 
@@ -270,86 +238,100 @@ const ContentFilter: React.FC<ContentFilterProps> = ({ device }) => {
                     </div>
                   ))}
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
 
-            {/* Allowed Sites */}
-            <Card className="bg-slate-800/50 border-slate-700">
-              <CardHeader>
-                <CardTitle className="text-white flex items-center gap-2">
-                  <CheckCircle className="h-5 w-5 text-green-400" />
-                  Allowed Websites
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
+        <TabsContent value="allowed">
+          <Card className="bg-slate-800/50 border-slate-700">
+            <CardHeader>
+              <CardTitle className="text-white">Allowed Websites</CardTitle>
+              <CardDescription className="text-slate-400">
+                Whitelist specific websites that are always allowed
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="flex gap-4">
+                  <Input 
+                    placeholder="Enter website URL to whitelist"
+                    className="bg-slate-700/50 border-slate-600 text-white"
+                  />
+                  <Button className="bg-green-600 hover:bg-green-700">
+                    <Plus className="mr-2 h-4 w-4" />
+                    Allow Site
+                  </Button>
+                </div>
+
                 <div className="space-y-3">
-                  {allowedSites.map((site) => (
-                    <div key={site.id} className="flex items-center justify-between p-3 bg-slate-700/30 rounded-lg border-l-4 border-l-green-500">
-                      <div>
-                        <h3 className="font-semibold text-white">{site.url}</h3>
-                        <Badge variant="outline" className="border-slate-600 text-slate-300 mt-1">
-                          {site.category}
-                        </Badge>
+                  {allowedSites.map((site, index) => (
+                    <div key={index} className="flex items-center justify-between p-3 bg-slate-700/30 rounded-lg border-l-4 border-l-green-500">
+                      <div className="flex items-center gap-3">
+                        <Globe className="h-5 w-5 text-green-400" />
+                        <div>
+                          <h4 className="text-white font-medium">{site.url}</h4>
+                          <p className="text-sm text-slate-400">{site.category}</p>
+                        </div>
                       </div>
                       <div className="flex items-center gap-2">
+                        <Badge className="bg-green-600">Whitelisted</Badge>
                         <Button 
                           variant="outline" 
                           size="sm"
                           className="border-red-600 text-red-400 hover:bg-red-900/20"
                         >
-                          <XCircle className="w-4 h-4 mr-1" />
-                          Block
-                        </Button>
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          className="border-red-600 text-red-400 hover:bg-red-900/20"
-                        >
-                          <Trash2 className="w-4 h-4" />
+                          Remove
                         </Button>
                       </div>
                     </div>
                   ))}
                 </div>
-              </CardContent>
-            </Card>
-          </div>
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
 
         <TabsContent value="activity">
           <Card className="bg-slate-800/50 border-slate-700">
             <CardHeader>
-              <CardTitle className="text-white">Content Filter Activity</CardTitle>
+              <CardTitle className="text-white">Browsing Activity</CardTitle>
               <CardDescription className="text-slate-400">
-                Recent filtering actions and blocked attempts
+                Recent web activity and filter actions
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
+              <div className="space-y-3">
                 {recentActivity.map((activity, index) => (
-                  <div key={index} className="flex items-center gap-4 p-3 bg-slate-700/30 rounded-lg">
+                  <div key={index} className="flex items-center justify-between p-3 bg-slate-700/30 rounded-lg">
                     <div className="flex items-center gap-3">
-                      {activity.action === 'Blocked' ? (
+                      {activity.action === 'blocked' ? (
                         <XCircle className="h-5 w-5 text-red-400" />
                       ) : (
                         <CheckCircle className="h-5 w-5 text-green-400" />
                       )}
-                      <span className="text-white font-medium">{activity.time}</span>
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2">
-                        <span className={`font-medium ${
-                          activity.action === 'Blocked' ? 'text-red-400' : 'text-green-400'
-                        }`}>
-                          {activity.action}
-                        </span>
-                        <span className="text-white">{activity.site}</span>
+                      <div>
+                        <h4 className="text-white font-medium">{activity.site}</h4>
+                        <p className="text-sm text-slate-400">{activity.category}</p>
                       </div>
-                      <p className="text-sm text-slate-400">{activity.category}</p>
+                    </div>
+                    <div className="text-right">
+                      <Badge 
+                        className={activity.action === 'blocked' ? 'bg-red-600' : 'bg-green-600'}
+                      >
+                        {activity.action}
+                      </Badge>
+                      <p className="text-sm text-slate-400 mt-1">{activity.time}</p>
                     </div>
                   </div>
                 ))}
               </div>
+              <Button 
+                variant="outline" 
+                className="w-full mt-4 border-slate-600 text-slate-300 hover:bg-slate-700"
+              >
+                View Full Activity Log
+              </Button>
             </CardContent>
           </Card>
         </TabsContent>
@@ -357,66 +339,53 @@ const ContentFilter: React.FC<ContentFilterProps> = ({ device }) => {
         <TabsContent value="settings">
           <Card className="bg-slate-800/50 border-slate-700">
             <CardHeader>
-              <CardTitle className="text-white">Content Filter Settings</CardTitle>
+              <CardTitle className="text-white">Filter Settings</CardTitle>
               <CardDescription className="text-slate-400">
-                Configure filtering behavior and restrictions
+                Configure content filtering behavior
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="space-y-4">
-                <div>
-                  <h4 className="text-white font-medium mb-3">Filter Intensity</h4>
-                  <div className="space-y-3">
-                    {filterLevels.map((level) => (
-                      <div 
-                        key={level.id}
-                        className={`p-3 rounded-lg border cursor-pointer transition-all ${
-                          filterLevel === level.id 
-                            ? 'border-blue-500 bg-blue-600/20' 
-                            : 'border-slate-600 bg-slate-700/30 hover:bg-slate-700/50'
-                        }`}
-                        onClick={() => setFilterLevel(level.id)}
-                      >
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <h5 className="text-white font-medium">{level.name}</h5>
-                            <p className="text-sm text-slate-400">{level.description}</p>
-                          </div>
-                          <div className={`w-4 h-4 rounded-full border-2 ${
-                            filterLevel === level.id 
-                              ? 'border-blue-500 bg-blue-500' 
-                              : 'border-slate-400'
-                          }`} />
-                        </div>
-                      </div>
-                    ))}
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h4 className="text-white font-medium">Safe Search</h4>
+                    <p className="text-sm text-slate-400">Force safe search on search engines</p>
                   </div>
+                  <Switch checked={safeSearchEnabled} onCheckedChange={setSafeSearchEnabled} />
                 </div>
 
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h4 className="text-white font-medium">Safe Search</h4>
-                      <p className="text-sm text-slate-400">Force safe search on search engines</p>
-                    </div>
-                    <Switch defaultChecked />
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h4 className="text-white font-medium">Ad Blocking</h4>
+                    <p className="text-sm text-slate-400">Block advertisements and pop-ups</p>
                   </div>
+                  <Switch checked={adBlockEnabled} onCheckedChange={setAdBlockEnabled} />
+                </div>
 
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h4 className="text-white font-medium">Block Downloads</h4>
-                      <p className="text-sm text-slate-400">Prevent downloading files from websites</p>
-                    </div>
-                    <Switch defaultChecked />
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h4 className="text-white font-medium">HTTPS Filtering</h4>
+                    <p className="text-sm text-slate-400">Filter encrypted HTTPS traffic</p>
                   </div>
+                  <Switch defaultChecked />
+                </div>
 
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h4 className="text-white font-medium">HTTPS Filtering</h4>
-                      <p className="text-sm text-slate-400">Filter encrypted traffic (may affect performance)</p>
-                    </div>
-                    <Switch />
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h4 className="text-white font-medium">YouTube Restricted Mode</h4>
+                    <p className="text-sm text-slate-400">Enable YouTube's restricted mode</p>
                   </div>
+                  <Switch defaultChecked />
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="text-white">Filter Sensitivity</Label>
+                  <select className="w-full p-2 bg-slate-700/50 border border-slate-600 rounded-md text-white">
+                    <option value="low">Low - Basic filtering</option>
+                    <option value="medium" selected>Medium - Balanced filtering</option>
+                    <option value="high">High - Strict filtering</option>
+                    <option value="maximum">Maximum - Very strict filtering</option>
+                  </select>
                 </div>
               </div>
             </CardContent>

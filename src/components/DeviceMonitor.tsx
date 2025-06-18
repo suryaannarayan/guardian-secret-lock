@@ -116,7 +116,7 @@ const DeviceMonitor: React.FC<DeviceMonitorProps> = ({ device }) => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
             <Button 
               onClick={handleLockDevice}
               className={`h-20 flex flex-col gap-2 ${
@@ -125,6 +125,14 @@ const DeviceMonitor: React.FC<DeviceMonitorProps> = ({ device }) => {
             >
               {isLocked ? <Lock className="h-6 w-6" /> : <Unlock className="h-6 w-6" />}
               {isLocked ? 'Unlock Device' : 'Lock Device'}
+            </Button>
+
+            <Button 
+              variant="outline" 
+              className="h-20 flex flex-col gap-2 border-blue-600 text-blue-400 hover:bg-blue-900/20"
+            >
+              <Smartphone className="h-6 w-6" />
+              Screen Mirror
             </Button>
 
             <Button 

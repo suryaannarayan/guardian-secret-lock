@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -23,6 +22,7 @@ import ScreenTimeManager from '@/components/ScreenTimeManager';
 import LocationTracker from '@/components/LocationTracker';
 import ContentFilter from '@/components/ContentFilter';
 import ActivityReports from '@/components/ActivityReports';
+import ScreenMirror from '@/components/ScreenMirror';
 
 const Dashboard = () => {
   const [selectedDevice, setSelectedDevice] = useState("child1-phone");
@@ -200,6 +200,7 @@ const Dashboard = () => {
           <Tabs defaultValue="monitor" className="space-y-4">
             <TabsList className="bg-slate-800/50 border-slate-700">
               <TabsTrigger value="monitor" className="data-[state=active]:bg-blue-600">Device Monitor</TabsTrigger>
+              <TabsTrigger value="mirror" className="data-[state=active]:bg-blue-600">Screen Mirror</TabsTrigger>
               <TabsTrigger value="apps" className="data-[state=active]:bg-blue-600">App Control</TabsTrigger>
               <TabsTrigger value="screentime" className="data-[state=active]:bg-blue-600">Screen Time</TabsTrigger>
               <TabsTrigger value="location" className="data-[state=active]:bg-blue-600">Location</TabsTrigger>
@@ -209,6 +210,10 @@ const Dashboard = () => {
 
             <TabsContent value="monitor">
               <DeviceMonitor device={selectedDeviceData} />
+            </TabsContent>
+
+            <TabsContent value="mirror">
+              <ScreenMirror device={selectedDeviceData} />
             </TabsContent>
 
             <TabsContent value="apps">
